@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.udacity.bakingapp.R;
 import com.udacity.bakingapp.fragments.RecipeGridFragment;
+import com.udacity.bakingapp.loaders.GetRecipesAsyncTaskLoader;
 import com.udacity.bakingapp.models.Recipe;
 
 public class RecipeGridActivity extends AppCompatActivity implements
@@ -43,15 +44,30 @@ public class RecipeGridActivity extends AppCompatActivity implements
         getSupportLoaderManager().restartLoader(LOADER_ID_RECIPES, null, this);
     }
 
+    private void RefreshFragmentData() {
+        //region Inspired by: https://stackoverflow.com/a/31832721/5999847
+        if (supportFragmentManager != null) {
+            RecipeGridFragment fragment = (RecipeGridFragment) supportFragmentManager.findFragmentById(R.id.fragment_recipe_grid);
+
+            // Notify fragment that the data set has changed and it should update is adapter.
+            if (fragment != null) {
+                fragment.NotifyChange();
+            }
+        }
+        //endregion
+    }
+
     @NonNull
     @Override
     public Loader onCreateLoader(int id, @Nullable Bundle args) {
-        return null; //new GetRecipesAsyncTaskLoader(this, args);
+        return new GetRecipesAsyncTaskLoader(this, args);
     }
 
     public void onLoadFinished(@NonNull Loader loader, Object loaderData) {
         if (loaderData != null)
             RecipeList = (Recipe[]) loaderData;
+
+        RefreshFragmentData();
     }
 
     @Override

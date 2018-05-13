@@ -3,7 +3,7 @@ package com.udacity.bakingapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class RecipeStep implements Parcelable {
+public class RecipeStep implements Parcelable {
     public final Long id;
     public final String shortDescription;
     public final String description;

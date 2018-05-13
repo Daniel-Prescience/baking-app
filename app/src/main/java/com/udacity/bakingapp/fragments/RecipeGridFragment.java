@@ -89,6 +89,15 @@ public class RecipeGridFragment extends Fragment {
         mListener = null;
     }
 
+    public void NotifyChange() {
+        if (mRecyclerView != null) {
+            mRecyclerView.setAdapter(new RecipeRecyclerViewAdapter(RecipeGridActivity.RecipeList, mListener, getActivity()));
+
+            if (mSavedRecyclerLayoutState != null)
+                mRecyclerView.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+        }
+    }
+
     public interface OnRecipeGridFragmentInteractionListener {
         void onRecipeGridFragmentInteraction(Recipe recipe);
     }

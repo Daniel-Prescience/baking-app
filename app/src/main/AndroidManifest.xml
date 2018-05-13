@@ -27,6 +27,9 @@
             android:name=".activities.RecipeStepListActivity"
             android:label="@string/title_recipe_list"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.udacity.bakingapp.activities.RecipeGridActivity" />
         </activity>
 
         <activity
