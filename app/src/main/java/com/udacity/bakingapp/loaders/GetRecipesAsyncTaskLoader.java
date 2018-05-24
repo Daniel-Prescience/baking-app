@@ -106,8 +106,8 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
                             stepJson.getString(JSON_STEPS_SHORTDESCRIPTION_KEY),
                             stepJson.getString(JSON_STEPS_DESCRIPTION_KEY),
                             stepJson.getString(JSON_STEPS_VIDEOURL_KEY),
-                            stepJson.getString(JSON_STEPS_THUMBNAILURL_KEY)
-                    );
+                            stepJson.getString(JSON_STEPS_THUMBNAILURL_KEY),
+                            recipeJson.getString(JSON_IMAGE_KEY));
                 }
 
                 recipes[i] = new Recipe(

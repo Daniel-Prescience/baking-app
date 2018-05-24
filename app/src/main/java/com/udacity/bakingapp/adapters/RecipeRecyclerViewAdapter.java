@@ -43,11 +43,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = mRecipes[position];
-        Picasso.with(mContext)
-                .load(holder.mItem.image)
-                .placeholder(R.mipmap.ic_launcher_round)
-                .error(R.drawable.ic_launcher_background)
-                .into(holder.mRecipeImageView);
+            Picasso.with(mContext)
+                    .load(holder.mItem.image)
+                    .placeholder(R.mipmap.ic_launcher_round)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(holder.mRecipeImageView);
 
         holder.mRecipeImageView.setContentDescription(holder.mItem.name);
         holder.mRecipeNameTextView.setText(holder.mItem.name);

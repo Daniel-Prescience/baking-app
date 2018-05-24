@@ -4,21 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.udacity.bakingapp.R;
 import com.udacity.bakingapp.fragments.RecipeStepDetailFragment;
-import com.udacity.bakingapp.dummy.DummyContent;
-
-import java.util.List;
+import com.udacity.bakingapp.models.Recipe;
+import com.udacity.bakingapp.models.RecipeStep;
+import com.udacity.bakingapp.utilities.UserInterfaceUtils;
 
 /**
  * An activity representing a list of Recipes. This activity
@@ -35,6 +35,7 @@ public class RecipeStepListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private Recipe mRecipe;
 
     public static final String EXTRA_RECIPE = "EXTRA_RECIPE";
 
@@ -47,14 +48,25 @@ public class RecipeStepListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+/*        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                        .setAction("Action", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Toast.makeText(RecipeStepListActivity.this, "TOAST!", Toast.LENGTH_LONG).show();
+                            }
+                        }).show();
             }
-        });
+        });*/
 
         if (findViewById(R.id.recipe_detail_container) != null) {
             // The detail container view will be present only in the
@@ -64,28 +76,64 @@ public class RecipeStepListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+        Intent intent = getIntent();
+
+        if (savedInstanceState != null)
+            mRecipe = savedInstanceState.getParcelable(EXTRA_RECIPE);
+        else if (intent != null)
+            mRecipe = intent.getParcelableExtra(EXTRA_RECIPE);
+
+        if (mRecipe == null)
+            closeOnError();
+
+        setTitle(mRecipe.name);
+
         View recyclerView = findViewById(R.id.recipe_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(EXTRA_RECIPE, mRecipe);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void closeOnError() {
+        UserInterfaceUtils.ShowToastMessage(getString(R.string.recipe_error_message), this);
+        finish();
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, mRecipe.steps, mTwoPane));
     }
 
     public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.RecipeStepViewHolder> {
 
         private final RecipeStepListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final RecipeStep[] mRecipeSteps;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                RecipeStep recipeStep = (RecipeStep) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(RecipeStepDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putParcelable(RecipeStepDetailFragment.ARG_RECIPE_STEP, recipeStep);
                     RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -94,7 +142,7 @@ public class RecipeStepListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, RecipeStepDetailActivity.class);
-                    intent.putExtra(RecipeStepDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra(RecipeStepDetailFragment.ARG_RECIPE_STEP, recipeStep);
 
                     context.startActivity(intent);
                 }
@@ -102,43 +150,40 @@ public class RecipeStepListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(RecipeStepListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      RecipeStep[] recipeSteps,
                                       boolean twoPane) {
-            mValues = items;
+            mRecipeSteps = recipeSteps;
             mParentActivity = parent;
             mTwoPane = twoPane;
         }
 
         @Override
         @NonNull
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public RecipeStepViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recipe_step_list_content, parent, false);
-            return new ViewHolder(view);
+                    .inflate(R.layout.item_recipe_step, parent, false);
+            return new RecipeStepViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+        public void onBindViewHolder(@NonNull final RecipeStepViewHolder holder, int position) {
+            holder.mRecipeStepShortDescriptionTextView.setText(mRecipeSteps[position].shortDescription);
 
-            holder.itemView.setTag(mValues.get(position));
+            holder.itemView.setTag(mRecipeSteps[position]);
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return mRecipeSteps.length;
         }
 
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
+        class RecipeStepViewHolder extends RecyclerView.ViewHolder {
+            final TextView mRecipeStepShortDescriptionTextView;
 
-            ViewHolder(View view) {
+            RecipeStepViewHolder(View view) {
                 super(view);
-                mIdView = view.findViewById(R.id.id_text);
-                mContentView = view.findViewById(R.id.content);
+                mRecipeStepShortDescriptionTextView = view.findViewById(R.id.recipe_step_short_description_text);
             }
         }
     }

@@ -17,8 +17,6 @@ import com.udacity.bakingapp.activities.RecipeGridActivity;
 import com.udacity.bakingapp.adapters.RecipeRecyclerViewAdapter;
 import com.udacity.bakingapp.models.Recipe;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-
 public class RecipeGridFragment extends Fragment {
 
     private static final String KEY_LAYOUT_MANAGER_STATE = "KEY_LAYOUT_MANAGER_STATE";
@@ -44,7 +42,7 @@ public class RecipeGridFragment extends Fragment {
             Context context = view.getContext();
             mRecyclerView = (RecyclerView) view;
 
-            int columnCount = getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE ? 3 : 1;
+            int columnCount = getResources().getConfiguration().screenWidthDp >= 900 ? 3 : 1;
 
             mGridLayoutManager = new GridLayoutManager(context, columnCount);
             mRecyclerView.setLayoutManager(mGridLayoutManager);
