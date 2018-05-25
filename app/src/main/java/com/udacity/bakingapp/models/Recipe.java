@@ -2,6 +2,10 @@ package com.udacity.bakingapp.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Recipe implements Parcelable {
     public final Long id;
@@ -19,6 +23,14 @@ public class Recipe implements Parcelable {
         this.steps = steps;
         this.servings = servings;
         this.image = image;
+    }
+
+    public String getIngredientsAsString() {
+        List<String> ingredientStringList = new ArrayList<>();
+        for (Ingredient ingredient: ingredients) {
+            ingredientStringList.add(ingredient.toString());
+        }
+        return TextUtils.join("\n", ingredientStringList);
     }
 
     @Override

@@ -14,7 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity android:name=".activities.RecipeGridActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.RecipeStepListActivity"
             android:label="@string/title_recipe_list"
@@ -31,7 +29,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.udacity.bakingapp.activities.RecipeGridActivity" />
         </activity>
-
         <activity
             android:name=".activities.RecipeStepDetailActivity"
             android:label="@string/title_recipe_detail"
@@ -42,6 +39,15 @@
                 android:value="com.udacity.bakingapp.activities.RecipeStepListActivity" />
         </activity>
 
+        <receiver android:name=".RecipeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recipe_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

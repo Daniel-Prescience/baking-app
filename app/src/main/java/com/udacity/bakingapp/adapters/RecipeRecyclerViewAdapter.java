@@ -1,5 +1,7 @@
 package com.udacity.bakingapp.adapters;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.bakingapp.R;
+import com.udacity.bakingapp.RecipeWidget;
 import com.udacity.bakingapp.fragments.RecipeGridFragment.OnRecipeGridFragmentInteractionListener;
 import com.udacity.bakingapp.models.Recipe;
 
@@ -59,6 +62,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         holder.mRecipeSetAsWidgetImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AppWidgetManager widgetManager = AppWidgetManager.getInstance(mContext);
+                int[] appWidgetIds = widgetManager.getAppWidgetIds(new ComponentName(mContext, RecipeWidget.class));
+                RecipeWidget.updateRecipeWidgets(mContext, widgetManager, appWidgetIds, holder.mItem);
+
                 // TODO: Implement setting recipe id in shared preference, which then should be read in the above todo.
                 ShowToastMessage(holder.mItem.name + " set as widget recipe.", mContext);
             }
