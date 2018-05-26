@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.udacity.bakingapp.activities.RecipeGridActivity;
@@ -28,7 +29,10 @@ public class RecipeWidget extends AppWidgetProvider {
 
             Intent intent = new Intent(context, RecipeStepListActivity.class);
             intent.putExtra(RecipeStepListActivity.EXTRA_RECIPE, recipe);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(intent)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+/*            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);*/
             views.setOnClickPendingIntent(R.id.widget_recipe_layout, pendingIntent);
         }
         else {

@@ -54,27 +54,8 @@ public class RecipeStepListActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-/*        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Toast.makeText(RecipeStepListActivity.this, "TOAST!", Toast.LENGTH_LONG).show();
-                            }
-                        }).show();
-            }
-        });*/
-
-        if (findViewById(R.id.recipe_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
+        if (findViewById(R.id.recipe_detail_container) != null)
             mTwoPane = true;
-        }
 
         Intent intent = getIntent();
 

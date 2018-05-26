@@ -55,10 +55,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         holder.mRecipeImageView.setContentDescription(holder.mItem.name);
         holder.mRecipeNameTextView.setText(holder.mItem.name);
 
-        // TODO: If recipe id equals the one stored in shared preferences, set as favorite.
-        if (holder.mItem.id == 1)
-            holder.mRecipeSetAsWidgetImageButton.setImageResource(R.drawable.ic_favorite_black_24dp);
-
         holder.mRecipeSetAsWidgetImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,7 +62,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 int[] appWidgetIds = widgetManager.getAppWidgetIds(new ComponentName(mContext, RecipeWidget.class));
                 RecipeWidget.updateRecipeWidgets(mContext, widgetManager, appWidgetIds, holder.mItem);
 
-                // TODO: Implement setting recipe id in shared preference, which then should be read in the above todo.
                 ShowToastMessage(holder.mItem.name + " set as widget recipe.", mContext);
             }
         });

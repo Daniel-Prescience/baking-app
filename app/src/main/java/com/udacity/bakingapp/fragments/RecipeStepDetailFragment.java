@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -199,6 +200,17 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         }
 
         mExoPlayerFullscreen = mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !(getResources().getConfiguration().screenWidthDp >= 900);
+
+        ImageView stepImage = mActivity.findViewById(R.id.recipe_step_detail_image);
+        if (!TextUtils.isEmpty(mRecipeStep.thumbnailURL)) {
+            Picasso.with(getContext())
+                    .load(mRecipeStep.thumbnailURL)
+                    .placeholder(R.mipmap.ic_launcher_round)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(stepImage);
+        }
+        else
+            stepImage.setVisibility(View.GONE);
 
         // Load cake image as default artwork.
         Target mTarget = new Target() {
