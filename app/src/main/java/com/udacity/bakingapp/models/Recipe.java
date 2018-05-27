@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe implements Parcelable {
-    public final Long id;
+    private final Long id;
     public final String name;
-    public final Ingredient[] ingredients;
+    private final Ingredient[] ingredients;
     public final RecipeStep[] steps;
-    public final Long servings;
+    private final Long servings;
     public final String image;
 
     public Recipe(Long id, String name, Ingredient[] ingredients, RecipeStep[] steps, Long servings, String image)
@@ -48,7 +48,7 @@ public class Recipe implements Parcelable {
         dest.writeString(this.image);
     }
 
-    protected Recipe(Parcel in) {
+    private Recipe(Parcel in) {
         this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.name = in.readString();
         this.ingredients = in.createTypedArray(Ingredient.CREATOR);

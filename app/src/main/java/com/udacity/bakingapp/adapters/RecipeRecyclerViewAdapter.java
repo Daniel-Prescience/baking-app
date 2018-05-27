@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.bakingapp.R;
-import com.udacity.bakingapp.RecipeWidget;
+import com.udacity.bakingapp.widgets.RecipeWidget;
 import com.udacity.bakingapp.fragments.RecipeGridFragment.OnRecipeGridFragmentInteractionListener;
 import com.udacity.bakingapp.models.Recipe;
 
@@ -85,17 +85,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.recipeCardView)
-        CardView mRecipeCardView;
-
-        @BindView(R.id.recipeImageView)
-        ImageView mRecipeImageView;
-
-        @BindView(R.id.recipeNameTextView)
-        TextView mRecipeNameTextView;
-
-        @BindView(R.id.recipeSetAsWidgetImageButton)
-        ImageButton mRecipeSetAsWidgetImageButton;
+        @BindView(R.id.recipeCardView) CardView mRecipeCardView;
+        @BindView(R.id.recipeImageView) ImageView mRecipeImageView;
+        @BindView(R.id.recipeNameTextView) TextView mRecipeNameTextView;
+        @BindView(R.id.recipeSetAsWidgetImageButton) ImageButton mRecipeSetAsWidgetImageButton;
 
         Recipe mItem;
 

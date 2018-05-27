@@ -9,4 +9,4 @@
     android:layout_height="match_parent"
     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
     tools:context=".activities.RecipeStepListActivity"
-    tools:listitem="@layout/item_recipe_step" />
+    tools:listitem="@layout/item_recipe_instruction" />

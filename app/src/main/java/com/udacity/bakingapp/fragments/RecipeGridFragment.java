@@ -42,7 +42,10 @@ public class RecipeGridFragment extends Fragment {
             Context context = view.getContext();
             mRecyclerView = (RecyclerView) view;
 
-            int columnCount = getResources().getConfiguration().screenWidthDp >= 900 ? 3 : 1;
+            int columnCount = (int)Math.ceil((getResources().getConfiguration().screenWidthDp - 150) / 300.0);
+
+            if (columnCount < 1)
+                columnCount = 1;
 
             mGridLayoutManager = new GridLayoutManager(context, columnCount);
             mRecyclerView.setLayoutManager(mGridLayoutManager);

@@ -1,6 +1,7 @@
 package com.udacity.bakingapp.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -15,24 +16,22 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
@@ -48,34 +47,48 @@ import com.udacity.bakingapp.models.RecipeStep;
  * in two-pane mode (on tablets) or a {@link RecipeStepDetailActivity}
  * on handsets.
  */
-public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.EventListener {
+public class RecipeStepDetailFragment extends Fragment implements Player.EventListener {
 
     public static final String ARG_RECIPE_STEP = "RECIPE_STEP";
-    private static final String INSTANCE_STATE_PLAYER_POSITION = "player_position";
-    private static final String INSTANCE_STATE_PLAYER_STATE = "player_state";
-/*    private final String STATE_RESUME_WINDOW = "resumeWindow";
-    private final String STATE_RESUME_POSITION = "resumePosition";*/
-    private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
-    private static final String TAG = RecipeStepDetailActivity.class.getSimpleName();
+    private static final String PLAYER_POSITION = "PLAYER_POSITION";
+    private static final String PLAYER_STATE = "PLAYER_STATE";
+    private static final String PLAYER_FULLSCREEN = "PLAYER_FULLSCREEN";
+    private static final String TAG = RecipeStepDetailFragment.class.getSimpleName();
 
     private FragmentActivity mActivity;
     private RecipeStep mRecipeStep;
 
     private SimpleExoPlayer mExoPlayer;
-    private SimpleExoPlayerView mPlayerView;
+    private PlayerView mPlayerView;
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
 
-    private boolean mExoPlayerFullscreen = false;
-    private Dialog mFullScreenDialog;
-/*    private int mResumeWindow;
-    private long mResumePosition;*/
-
     private long mPlayerPosition;
-    private boolean mPlayState;
+    private boolean mPlayState = true;
+    private boolean mPlayerFullscreen = false;
+
+    private Dialog mFullScreenDialog;
 
     public RecipeStepDetailFragment() {
     }
+
+    //region Inspired by https://stackoverflow.com/questions/14999698/android-how-to-notify-activity-when-fragments-views-are-ready#answer-15007656
+    public interface OnCompleteListener {
+        void onFragmentAttachComplete();
+    }
+
+    private OnCompleteListener mListener;
+
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            this.mListener = (OnCompleteListener)context;
+        }
+        catch (final ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnCompleteListener");
+        }
+    }
+    //endregion
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -85,11 +98,9 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         mActivity = getActivity();
 
         if (savedInstanceState != null) {
-            mPlayerPosition = savedInstanceState.getLong(INSTANCE_STATE_PLAYER_POSITION);
-            mPlayState = savedInstanceState.getBoolean(INSTANCE_STATE_PLAYER_STATE);
-/*            mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
-            mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);*/
-            mExoPlayerFullscreen = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
+            mPlayerPosition = savedInstanceState.getLong(PLAYER_POSITION);
+            mPlayState = savedInstanceState.getBoolean(PLAYER_STATE);
+            mPlayerFullscreen = savedInstanceState.getBoolean(PLAYER_FULLSCREEN);
         }
 
         Bundle fragmentArguments = getArguments();
@@ -97,9 +108,8 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         if (fragmentArguments != null && fragmentArguments.containsKey(ARG_RECIPE_STEP))
             mRecipeStep = fragmentArguments.getParcelable(ARG_RECIPE_STEP);
 
-        TextView recipeDetailTextView = rootView.findViewById(R.id.recipe_step_detail_text);
-
         if (mRecipeStep != null) {
+            TextView recipeDetailTextView = rootView.findViewById(R.id.recipe_step_detail_text);
             recipeDetailTextView.setText(mRecipeStep.description);
         }
 
@@ -108,19 +118,14 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putLong(INSTANCE_STATE_PLAYER_POSITION, mPlayerPosition);
-        outState.putBoolean(INSTANCE_STATE_PLAYER_STATE, mPlayState);
-        outState.putBoolean(STATE_PLAYER_FULLSCREEN, mExoPlayerFullscreen);
+        outState.putLong(PLAYER_POSITION, mPlayerPosition);
+        outState.putBoolean(PLAYER_STATE, mPlayState);
+        outState.putBoolean(PLAYER_FULLSCREEN, mPlayerFullscreen);
 
         super.onSaveInstanceState(outState);
     }
 
-    /**
-     * Initialize ExoPlayer.
-     *
-     * @param mediaUri The URI of the sample to play.
-     */
-    private void initializePlayer(Uri mediaUri) {
+    private void initializePlayer() {
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
@@ -132,8 +137,8 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             String userAgent = Util.getUserAgent(mActivity, mActivity.getPackageName());
 
             if (!TextUtils.isEmpty(mRecipeStep.videoURL)) {
-                MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
-                        new DefaultDataSourceFactory(mActivity, userAgent), new DefaultExtractorsFactory(), null, null);
+                ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(new DefaultDataSourceFactory(mActivity, userAgent));
+                MediaSource mediaSource = factory.createMediaSource(Uri.parse(mRecipeStep.videoURL));
                 mExoPlayer.prepare(mediaSource);
                 mExoPlayer.setPlayWhenReady(mPlayState);
                 mExoPlayer.seekTo(mPlayerPosition);
@@ -156,7 +161,6 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
      * and media controller.
      */
     private void initializeMediaSession() {
-
         // Create a MediaSessionCompat.
         mMediaSession = new MediaSessionCompat(mActivity, TAG);
 
@@ -183,13 +187,11 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
         // Start the Media Session since the activity is active.
         mMediaSession.setActive(true);
-
     }
     //endregion
 
     @Override
     public void onResume() {
-
         super.onResume();
 
         initializeMediaSession();
@@ -199,18 +201,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             initFullscreenDialog();
         }
 
-        mExoPlayerFullscreen = mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !(getResources().getConfiguration().screenWidthDp >= 900);
-
-        ImageView stepImage = mActivity.findViewById(R.id.recipe_step_detail_image);
-        if (!TextUtils.isEmpty(mRecipeStep.thumbnailURL)) {
-            Picasso.with(getContext())
-                    .load(mRecipeStep.thumbnailURL)
-                    .placeholder(R.mipmap.ic_launcher_round)
-                    .error(R.drawable.ic_launcher_background)
-                    .into(stepImage);
-        }
-        else
-            stepImage.setVisibility(View.GONE);
+        mPlayerFullscreen = mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !(getResources().getConfiguration().screenWidthDp >= 900);
 
         // Load cake image as default artwork.
         Target mTarget = new Target() {
@@ -229,26 +220,34 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         };
 
         Picasso.with(getContext())
-                .load(mRecipeStep.fallbackImageURL)
+                .load(!TextUtils.isEmpty(mRecipeStep.thumbnailURL) ? mRecipeStep.thumbnailURL : mRecipeStep.fallbackImageURL)
                 .placeholder(R.mipmap.ic_launcher_round)
                 .error(R.drawable.ic_launcher_background)
                 .into(mTarget);
 
-        initializePlayer(Uri.parse(mRecipeStep.videoURL));
+        initializePlayer();
 
-        if (mExoPlayerFullscreen && !TextUtils.isEmpty(mRecipeStep.videoURL)) {
+        if (mPlayerFullscreen && !TextUtils.isEmpty(mRecipeStep.videoURL)) {
             ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
             mFullScreenDialog.addContentView(mPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             mFullScreenDialog.show();
-            mFullScreenDialog.getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            );
+
+            Window window = mFullScreenDialog.getWindow();
+
+            if (window != null) {
+                window.getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                );
+            }
         }
+
+        // Signal parent Activity that we're done setting up fragment views.
+        mListener.onFragmentAttachComplete();
     }
 
 

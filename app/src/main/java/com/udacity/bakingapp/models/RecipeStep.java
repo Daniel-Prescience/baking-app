@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class RecipeStep implements Parcelable {
-    public final Long id;
+    private final Long id;
     public final String shortDescription;
     public final String description;
     public final String videoURL;
@@ -36,7 +36,7 @@ public class RecipeStep implements Parcelable {
         dest.writeString(this.fallbackImageURL);
     }
 
-    protected RecipeStep(Parcel in) {
+    private RecipeStep(Parcel in) {
         this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.shortDescription = in.readString();
         this.description = in.readString();

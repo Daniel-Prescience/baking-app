@@ -1,11 +1,13 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_recipe_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#09C"
-    android:padding="@dimen/widget_margin">
+    android:background="#3F51B5"
+    android:padding="@dimen/widget_margin"
+    tools:ignore="Overdraw">
+
 
     <TextView
         android:id="@+id/widget_recipe_name"
@@ -13,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="8dp"
-        android:background="#09C"
+        android:background="#3F51B5"
         android:contentDescription="@string/appwidget_text"
         android:text="@string/appwidget_text"
         android:textColor="#ffffff"
@@ -24,7 +26,9 @@
         android:id="@+id/widget_recipe_ingredients"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="#ffffff"
         android:padding="@dimen/text_margin"
+        tools:text="@string/appwidget_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 </LinearLayout>

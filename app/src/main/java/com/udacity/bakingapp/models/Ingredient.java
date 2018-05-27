@@ -4,9 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Ingredient implements Parcelable {
-    public final Long quantity;
-    public final String measure;
-    public final String ingredient;
+    private final Long quantity;
+    private final String measure;
+    private final String ingredient;
 
     public Ingredient(Long quantity, String measure, String ingredient)
     {
@@ -32,7 +32,7 @@ public class Ingredient implements Parcelable {
         dest.writeString(this.ingredient);
     }
 
-    protected Ingredient(Parcel in) {
+    private Ingredient(Parcel in) {
         this.quantity = (Long) in.readValue(Long.class.getClassLoader());
         this.measure = in.readString();
         this.ingredient = in.readString();

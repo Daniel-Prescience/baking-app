@@ -5,33 +5,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
     android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
     tools:context=".activities.RecipeStepListActivity">
 
-    <!--
-    This layout is a two-pane layout for the Recipes
-    master/detail flow.
-    
-    -->
-
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/recipe_list"
         android:name="com.udacity.bakingapp.RecipeListFragment"
-        android:layout_width="@dimen/item_width"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         tools:context="com.udacity.bakingapp.activities.RecipeStepListActivity"
-        tools:listitem="@layout/item_recipe_step" />
+        tools:listitem="@layout/item_recipe_instruction" />
 
-    <FrameLayout
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/recipe_detail_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3" />
+        android:layout_weight="3"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="InconsistentLayout" />
 
 </LinearLayout>

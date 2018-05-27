@@ -1,12 +1,11 @@
 package com.udacity.bakingapp.loaders;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.udacity.bakingapp.models.Recipe;
 import com.udacity.bakingapp.models.Ingredient;
+import com.udacity.bakingapp.models.Recipe;
 import com.udacity.bakingapp.models.RecipeStep;
 
 import org.json.JSONArray;
@@ -37,19 +36,16 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
     private static final String JSON_SERVINGS_KEY = "servings";
     private static final String JSON_IMAGE_KEY = "image";
 
-    public GetRecipesAsyncTaskLoader(Context context, Bundle args) {
+    public GetRecipesAsyncTaskLoader(Context context) {
         super(context);
     }
 
     @Override
     protected void onStartLoading() {
-        if (mRecipes != null) {
-            // Delivers any previously loaded data immediately
+        if (mRecipes != null)
             deliverResult(mRecipes);
-        } else {
-            // Force a new load
+        else
             forceLoad();
-        }
     }
 
     @Override
@@ -73,6 +69,7 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
 
             byte[] buffer = new byte[size];
 
+            //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
 

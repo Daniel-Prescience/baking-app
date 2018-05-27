@@ -60,7 +60,7 @@ public class RecipeGridActivity extends AppCompatActivity implements
     @NonNull
     @Override
     public Loader onCreateLoader(int id, @Nullable Bundle args) {
-        return new GetRecipesAsyncTaskLoader(this, args);
+        return new GetRecipesAsyncTaskLoader(this);
     }
 
     public void onLoadFinished(@NonNull Loader loader, Object loaderData) {
