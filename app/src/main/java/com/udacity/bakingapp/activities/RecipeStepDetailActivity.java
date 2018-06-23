@@ -65,7 +65,6 @@ public class RecipeStepDetailActivity extends AppCompatActivity implements Recip
                         getResources().getString(R.string.ingredients),
                         mRecipe.getIngredientsAsString(),
                         null,
-                        mRecipe.image,
                         mRecipe.image);
                 arguments.putParcelable(RecipeStepDetailFragment.ARG_RECIPE_STEP, ingredientsAsRecipeStep);
             }
@@ -142,7 +141,6 @@ public class RecipeStepDetailActivity extends AppCompatActivity implements Recip
                                 (long) 0,
                                 getResources().getString(R.string.ingredients), mRecipe.getIngredientsAsString(),
                                 null,
-                                mRecipe.image,
                                 mRecipe.image);
                         arguments.putParcelable(RecipeStepDetailFragment.ARG_RECIPE_STEP, ingredientsAsRecipeStep);
                     }

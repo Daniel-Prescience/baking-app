@@ -12,8 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
 
@@ -60,22 +65,21 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
     }
 
     private Recipe[] getRecipes() {
-        //region Credit: https://stackoverflow.com/questions/13814503/reading-a-json-file-in-android#answer-13814551
         try {
-            // Images matching the recipes have been manually added to the course project provided json resource "recipes.json", which is loaded here.
-            InputStream is = getContext().getAssets().open("recipes.json");
+            String urlString = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+            URL url = new URL(urlString);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-            int size = is.available();
+            InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder builder = new StringBuilder();
 
-            byte[] buffer = new byte[size];
+            String inputString;
+            while ((inputString = bufferedReader.readLine()) != null) {
+                builder.append(inputString);
+            }
 
-            //noinspection ResultOfMethodCallIgnored
-            is.read(buffer);
-            is.close();
-
-            String json = new String(buffer, "UTF-8");
-
-            JSONArray recipesJson = new JSONArray(json);
+            JSONArray recipesJson = new JSONArray(builder.toString());
 
             Recipe[] recipes = new Recipe[recipesJson.length()];
 
@@ -103,8 +107,7 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
                             stepJson.getString(JSON_STEPS_SHORTDESCRIPTION_KEY),
                             stepJson.getString(JSON_STEPS_DESCRIPTION_KEY),
                             stepJson.getString(JSON_STEPS_VIDEOURL_KEY),
-                            stepJson.getString(JSON_STEPS_THUMBNAILURL_KEY),
-                            recipeJson.getString(JSON_IMAGE_KEY));
+                            stepJson.getString(JSON_STEPS_THUMBNAILURL_KEY));
                 }
 
                 recipes[i] = new Recipe(
@@ -123,6 +126,5 @@ public class GetRecipesAsyncTaskLoader extends AsyncTaskLoader<Recipe[]> {
             Log.e(TAG, "Error", e);
             return null;
         }
-        //endregion
     }
 }

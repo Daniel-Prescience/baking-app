@@ -9,16 +9,14 @@ public class RecipeStep implements Parcelable {
     public final String description;
     public final String videoURL;
     public final String thumbnailURL;
-    public final String fallbackImageURL;
 
-    public RecipeStep(Long id, String shortDescription, String description, String videoURL, String thumbnailURL, String fallbackImageURL)
+    public RecipeStep(Long id, String shortDescription, String description, String videoURL, String thumbnailURL)
     {
         this.id = id;
         this.shortDescription = shortDescription;
         this.description = description;
         this.videoURL = videoURL;
         this.thumbnailURL = thumbnailURL;
-        this.fallbackImageURL = fallbackImageURL;
     }
 
     @Override
@@ -33,7 +31,6 @@ public class RecipeStep implements Parcelable {
         dest.writeString(this.description);
         dest.writeString(this.videoURL);
         dest.writeString(this.thumbnailURL);
-        dest.writeString(this.fallbackImageURL);
     }
 
     private RecipeStep(Parcel in) {
@@ -42,7 +39,6 @@ public class RecipeStep implements Parcelable {
         this.description = in.readString();
         this.videoURL = in.readString();
         this.thumbnailURL = in.readString();
-        this.fallbackImageURL = in.readString();
     }
 
     public static final Parcelable.Creator<RecipeStep> CREATOR = new Parcelable.Creator<RecipeStep>() {

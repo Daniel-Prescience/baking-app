@@ -57,7 +57,7 @@ public class RecipeStepListActivity extends AppCompatActivity implements RecipeS
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (findViewById(R.id.recipe_detail_container) != null)
+        if ((getResources().getBoolean(R.bool.isTablet)))
             mTwoPane = true;
 
         Intent intent = getIntent();
@@ -80,7 +80,6 @@ public class RecipeStepListActivity extends AppCompatActivity implements RecipeS
                     (long)0,
                     getResources().getString(R.string.ingredients), mRecipe.getIngredientsAsString(),
                     null,
-                    mRecipe.image,
                     mRecipe.image);
             arguments.putParcelable(RecipeStepDetailFragment.ARG_RECIPE_STEP, ingredientsAsRecipeStep);
             RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();

@@ -91,7 +91,6 @@ public class RecipeStepListRecyclerViewAdapter extends RecyclerView.Adapter<Reci
                     (long)0,
                     mParentActivity.getResources().getString(R.string.ingredients), mRecipe.getIngredientsAsString(),
                     null,
-                    mRecipe.image,
                     mRecipe.image);
             holder.itemView.setTag(ingredientsAsRecipeStep);
             holder.itemView.setOnClickListener(getRecipeStepItemClickListener(position));

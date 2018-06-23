@@ -136,13 +136,18 @@ public class RecipeStepDetailFragment extends Fragment implements Player.EventLi
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(mActivity, mActivity.getPackageName());
 
-            if (!TextUtils.isEmpty(mRecipeStep.videoURL)) {
+            String videoOrImageUrlToLoad = mRecipeStep.videoURL;
+            if (TextUtils.isEmpty(videoOrImageUrlToLoad))
+                videoOrImageUrlToLoad = mRecipeStep.thumbnailURL;
+
+            if (!TextUtils.isEmpty(videoOrImageUrlToLoad)) {
                 ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(new DefaultDataSourceFactory(mActivity, userAgent));
-                MediaSource mediaSource = factory.createMediaSource(Uri.parse(mRecipeStep.videoURL));
+                MediaSource mediaSource = factory.createMediaSource(Uri.parse(videoOrImageUrlToLoad));
                 mExoPlayer.prepare(mediaSource);
                 mExoPlayer.setPlayWhenReady(mPlayState);
                 mExoPlayer.seekTo(mPlayerPosition);
-            } else
+            }
+            else
                 mPlayerView.setVisibility(View.GONE);
         }
     }
@@ -201,7 +206,9 @@ public class RecipeStepDetailFragment extends Fragment implements Player.EventLi
             initFullscreenDialog();
         }
 
-        mPlayerFullscreen = mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !(getResources().getConfiguration().screenWidthDp >= 900);
+        // Show video in fullscreen if we're not on a tablet and orientation is landscape.
+        mPlayerFullscreen = !(getResources().getBoolean(R.bool.isTablet)) &&
+                mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         // Load cake image as default artwork.
         Target mTarget = new Target() {
@@ -219,11 +226,13 @@ public class RecipeStepDetailFragment extends Fragment implements Player.EventLi
             }
         };
 
-        Picasso.with(getContext())
-                .load(!TextUtils.isEmpty(mRecipeStep.thumbnailURL) ? mRecipeStep.thumbnailURL : mRecipeStep.fallbackImageURL)
-                .placeholder(R.mipmap.ic_launcher_round)
-                .error(R.drawable.ic_launcher_background)
-                .into(mTarget);
+        if (!TextUtils.isEmpty(mRecipeStep.thumbnailURL)){
+            Picasso.with(getContext())
+                    .load(mRecipeStep.thumbnailURL)
+                    .placeholder(R.mipmap.ic_launcher_round)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(mTarget);
+        }
 
         initializePlayer();
 

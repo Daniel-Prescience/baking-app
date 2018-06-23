@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +47,13 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = mRecipes[position];
+        if (!TextUtils.isEmpty(holder.mItem.image)) {
             Picasso.with(mContext)
                     .load(holder.mItem.image)
                     .placeholder(R.mipmap.ic_launcher_round)
                     .error(R.drawable.ic_launcher_background)
                     .into(holder.mRecipeImageView);
+        }
 
         holder.mRecipeImageView.setContentDescription(holder.mItem.name);
         holder.mRecipeNameTextView.setText(holder.mItem.name);
